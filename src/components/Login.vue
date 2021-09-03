@@ -82,7 +82,7 @@ export default {
                 }
                 sessionStorage.setItem('token', response.data.token)
                 // 在路由器身上添加一个token属性，将token值作为该属性的值，保存起来
-                this.$router.token = response.data.token
+                // this.$router.token = response.data.token
                 // 跳转到home组件
                 this.$router.push('/home')
             })
