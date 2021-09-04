@@ -1,7 +1,7 @@
 import Vue from 'vue'
-import { Button } from 'element-ui'
 
 import {
+    Button,
     Form,
     FormItem,
     Input,
@@ -24,7 +24,11 @@ import {
     Tooltip,
     Pagination,
     Dialog,
-    MessageBox 
+    MessageBox,
+    Tag,
+    Tree,
+    Select,
+    Option
 } from 'element-ui'
 
 Vue.use(Button)
@@ -49,6 +53,10 @@ Vue.use(Switch)
 Vue.use(Tooltip)
 Vue.use(Pagination)
 Vue.use(Dialog)
+Vue.use(Tag)
+Vue.use(Tree)
+Vue.use(Select)
+Vue.use(Option)
 
 
 // 将弹窗消息提示组件挂在Vue的原型上

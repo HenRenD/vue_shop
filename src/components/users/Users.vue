@@ -38,7 +38,7 @@
                         <el-button type="primary" icon="el-icon-edit" size="mini" @click="editUserDialogShow(scopeData.row)"></el-button>
                         <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteUser(scopeData.row.id)"></el-button>
                         <el-tooltip effect="dark" content="分配角色" placement="top" v-bind:enterable="false">
-                            <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+                            <el-button type="warning" icon="el-icon-setting" size="mini" @click="setRolesShow(scopeData.row)"></el-button>
                         </el-tooltip>
                     </template>
                 </el-table-column>
@@ -94,7 +94,23 @@
             </span>
         </el-dialog>
 
-        <!-- 删除用户对话框 -->
+        <!-- 分配角色对话框 -->
+        <el-dialog title="分配角色" :visible.sync="setRolesDialogVisible" width="50%" @close="setRolesDialogClosed">
+            <div>
+                <p>当前用户：{{rolesInfo.username}}</p>
+                <p>当前角色：{{rolesInfo.role_name}}</p>
+                <p>
+                    分配新角色：
+                    <el-select v-model="selectRole" placeholder="请选择">
+                        <el-option v-for="item in rolesList" :key="item.id" :label="item.roleName" :value="item.id"></el-option>
+                    </el-select>
+                </p>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="setRolesDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="setRoles">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -189,6 +205,14 @@ export default {
                     },
                 ],
             },
+            // 控制分配角色对话框的显示和隐藏
+            setRolesDialogVisible: false,
+            // 当前角色信息
+            rolesInfo: {},
+            // 获取的所有的角色信息
+            rolesList: [],
+            // 选中的角色
+            selectRole:''
         }
     },
     methods: {
@@ -275,22 +299,60 @@ export default {
         },
         // 删除用户
         deleteUser(value) {
-            this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+            this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning',
-            }).then(async () => {
-                const {data:res} = await this.$http.delete("users/"+value)
-                if (res.meta.status !== 200){
+            })
+                .then(async () => {
+                    const { data: res } = await this.$http.delete(
+                        'users/' + value
+                    )
+                    if (res.meta.status !== 200) {
+                        return this.$message.error(res.meta.msg)
+                    }
+                    this.$message.success('删除成功~')
+                    this.getUserList()
+                })
+                .catch(() => {
+                    this.$message.info('已取消~')
+                })
+        },
+        // 分配角色显示对话框
+        setRolesShow(roles) {
+            this.rolesInfo = roles
+            // 获取角色列表
+            this.$http
+                .get('roles')
+                .then(({ data: res }) => {
+                    if (res.meta.status !== 200) {
+                        return this.$message.error(res.meta.msg)
+                    }
+                    this.rolesList = res.data
+                })
+                .catch((err) => err)
+            this.setRolesDialogVisible = true
+        },
+        // 分配角色 发起请求
+        setRoles(){
+            if (!this.selectRole){
+                return this.$message.info("请选择要分配的角色！")
+            }
+            this.$http.put(`users/${this.rolesInfo.id}/role`,{rid:this.selectRole}).then(({data:res}) => {
+                if(res.meta.status !== 200){
                     return this.$message.error(res.meta.msg)
                 }
-                this.$message.success("删除成功~")
+                this.$message.success(res.meta.msg)
+                this.setRolesDialogVisible = false
                 this.getUserList()
-                
-            }).catch(() => {
-                this.$message.info("已取消~")
-            })
+            }).catch(err => err)
         },
+        // 分配角色对话框关闭时调用的函数
+        setRolesDialogClosed(){
+            this.selectRole = ""
+            this.rolesInfo = {}
+        }
+
     },
     // 生命周期钩子，创建之后
     created() {
