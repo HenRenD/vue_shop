@@ -10,3 +10,6 @@ html,body,#app{
     height: 300px; 
     /* width: 200px; */
   }
+.ql-editor{
+    min-height: 400px;
+}
