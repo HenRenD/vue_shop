@@ -36,7 +36,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="100px">
-                    <template slot-scope="scope">
+                    <template>
                         <el-button size="small" type="primary" icon="el-icon-edit" circle @click="editAddressDialogShow"></el-button>
                         <el-button size="small" type="success" icon="el-icon-location" circle @click="showOrderStatus"></el-button>
                     </template>
